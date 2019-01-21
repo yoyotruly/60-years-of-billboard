@@ -25,6 +25,12 @@ class ChartSpider(scrapy.Spider):
         for url in lyrics_urls:
             yield scrapy.Request(url, self.parse_lyrics)
 
+        # follow link of previous chart
+        prev_url = response.css('.dropdown__date-selector-option:nth-child(1) a::attr(href)')
+        prev_url = prev_url.extract_first()
+        if prev_url is not None:
+            yield response.follow(prev_url, self.parse)
+
     def parse_lyrics(self, response):
         headline = response.css('.article__headline::text')
         lyrics = response.css('p:nth-child(1)::text')
